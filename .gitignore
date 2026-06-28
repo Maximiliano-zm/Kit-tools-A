@@ -2,6 +2,7 @@
 node_modules/
 *.tgz
 npm-debug.log*
+.npmrc
 
 # Basura del sistema / editores
 Thumbs.db
