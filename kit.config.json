@@ -1,9 +1,0 @@
-{
-  "githubUser": "Maximiliano-zm",
-  "authorName": "Maximiliano Zurita",
-  "marketplaceName": "gama-marketplace",
-  "marketplaceDescription": "Marketplace de agentes (plugins) para Claude desktop.",
-  "license": "UNLICENSED",
-  "defaultCategory": "documentation",
-  "defaultVersion": "0.1.0"
-}

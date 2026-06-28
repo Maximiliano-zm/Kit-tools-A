@@ -17,8 +17,10 @@ Todos van junto a este SKILL.md. Refiérelos con **rutas relativas**:
 ## Flujo de trabajo
 1. Recibe la entrada del usuario.
 2. Pregunta lo que no puedas inferir ni inventar (espera la respuesta).
-3. Genera o ejecuta lo necesario (instala dependencias con `pip install` si faltan).
-4. Valida el resultado y entrega los archivos como descargables.
+3. Si la tarea es compleja o de varios pasos, **propón planificar primero** (modo `/plan`):
+   presenta un plan breve y espera la aprobación del usuario antes de ejecutar.
+4. Genera o ejecuta lo necesario (instala dependencias con `pip install` si faltan).
+5. Valida el resultado y entrega los archivos como descargables.
 
 ## Principios
 - Responde en español.

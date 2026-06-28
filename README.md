@@ -1,160 +1,123 @@
-# Kit-tools-Agentes
+# claude-agent-kit-mz
 
-Kit local para **crear agentes (plugins/skills) para Claude desktop** siguiendo la receta
-"marketplace + plugin en GitHub". Con un solo comando genera toda la estructura de un agente
-nuevo, lista para `git push` e instalar en la app de Claude.
+CLI para **crear agentes (plugins/skills) para la app de Claude desktop**. Genera toda la
+estructura "marketplace + plugin" lista para `git push` e instalar en Claude — con un
+**asistente interactivo** o por flags. Cross-platform (Windows/Mac/Linux).
+
+```bash
+npx claude-agent-kit-mz          # asistente interactivo, sin instalar nada
+```
 
 ---
 
-## ¿Qué incluye?
-
-```
-Kit-tools-Agentes/
-├── kit.config.json          ← tus defaults (usuario GitHub, autor, licencia…)
-├── templates/               ← plantillas con marcadores {{...}}
-│   ├── marketplace.json
-│   ├── plugin.json
-│   └── SKILL.md
-├── tools/
-│   ├── new-agent.ps1        ← genera un agente nuevo
-│   └── bump-version.ps1     ← sube la versión en todos los archivos (para actualizar)
-└── README.md
-```
-
-> Requisitos: **Git** instalado. **PowerShell** (viene con Windows). No necesitas Python
-> en tu PC: los `scripts/.py` del agente corren en el sandbox de Claude.
+## Requisitos
+- **Node.js ≥ 18** (probado en Node 24). Eso es todo para *crear* agentes.
+- **Git** para publicarlos en GitHub.
+- Los agentes que generes **no necesitan Node** en runtime: sus `scripts/.py` corren en el
+  sandbox de Claude.
 
 ---
 
-## 1) Configura tus defaults (una sola vez)
+## Inicio rápido
 
-Edita `kit.config.json` y pon tu usuario de GitHub y tu nombre:
-
-```json
-{
-  "githubUser": "tu-usuario",
-  "authorName": "Tu Nombre",
-  "marketplaceName": "gama-marketplace",
-  "license": "UNLICENSED",
-  "defaultCategory": "documentation",
-  "defaultVersion": "0.1.0"
-}
+### Opción A — sin instalar (recomendada)
+```bash
+npx claude-agent-kit-mz
 ```
+El asistente te pregunta nombre, qué hace, disparador, usuario de GitHub, etc., y genera el
+agente. (Guarda tu usuario/autor en `~/.claude-agent-kit.json` para la próxima vez.)
 
-Estos valores se usan como predeterminados al generar cada agente (puedes
-sobreescribirlos por parámetro en cada llamada).
+### Opción B — instalación global
+```bash
+npm i -g claude-agent-kit-mz
+crea-agente            # alias corto
+# o:
+claude-agent-kit-mz new mi-agente --description "..." --trigger "..."
+```
 
 ---
 
-## 2) Crea un agente nuevo
+## Comandos
 
-Desde la carpeta del kit:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\new-agent.ps1 `
-  -Name mi-agente `
-  -Description "Genera cotizaciones en .docx a partir de una lista de precios." `
-  -Trigger "Úsalo cuando el usuario pegue una lista de precios o pida una cotización." `
-  -OutDir C:\Users\mz\Desktop\agentes
+### `new [nombre]` — genera un agente
+Sin datos suficientes abre el asistente. Por flags (no interactivo):
+```bash
+npx claude-agent-kit-mz new cotizador \
+  --description "Genera cotizaciones en .docx a partir de una lista de precios." \
+  --trigger "Úsalo cuando el usuario pegue una lista de precios o pida una cotización." \
+  --github-user tu-usuario \
+  --out-dir ./agentes
 ```
 
-Esto crea `C:\Users\mz\Desktop\agentes\mi-agente\` con la estructura completa:
-
+Crea:
 ```
-mi-agente/
+cotizador/
 ├── .claude-plugin/marketplace.json
-├── plugins/mi-agente/
+├── plugins/cotizador/
 │   ├── .claude-plugin/plugin.json
-│   └── skills/mi-agente/
+│   └── skills/cotizador/
 │       ├── SKILL.md          ← edita aquí el "cerebro" del agente
 │       ├── references/.gitkeep
 │       └── assets/.gitkeep
 └── README.md
 ```
 
-### Parámetros de `new-agent.ps1`
+| Opción | Qué hace |
+|---|---|
+| `--name <kebab>` | Nombre del agente (también acepta posicional: `new mi-agente`). |
+| `--description "<texto>"` | Qué hace, en una línea. |
+| `--trigger "<texto>"` | **El disparador** (frontmatter de `SKILL.md`): decide cuándo Claude activa el skill. Sé específico. |
+| `--title` / `--repo` | Título legible / nombre del repo (por defecto se derivan del nombre). |
+| `--github-user` / `--author` | Por defecto, los guardados en `~/.claude-agent-kit.json`. |
+| `--category` / `--keywords "a, b, c"` | Metadatos del marketplace. |
+| `--marketplace-name <n>` | Nombre del marketplace (def. `mi-marketplace`). |
+| `--license <id>` | Licencia del plugin generado (def. `UNLICENSED`). |
+| `--version <x.y.z>` | Versión inicial (def. `0.1.0`). |
+| `--out-dir <ruta>` | Dónde crear el repo (def. carpeta actual). |
+| `--with-scripts` | Crea `scripts/ejemplo.py`. |
+| `--git-init` | `git init` + `git add` en el repo nuevo. |
+| `--force` | Sobreescribe si la carpeta existe. |
+| `--dry-run` | Muestra qué crearía, sin escribir. |
+| `--yes` | No interactivo: usa defaults sin preguntar. |
 
-| Parámetro | Obligatorio | Qué hace |
-|---|---|---|
-| `-Name` | **Sí** | Nombre del agente en kebab-case (`mi-agente`). |
-| `-Description` | No | Qué hace, en una línea (va a marketplace.json y plugin.json). |
-| `-Trigger` | No | El **disparador** (frontmatter `description` del SKILL.md). Decide cuándo Claude activa el skill. Si se omite, se arma desde `-Description`. |
-| `-Title` | No | Título legible del SKILL.md (por defecto se deriva del `-Name`). |
-| `-Repo` | No | Nombre del repo (por defecto = `-Name`). |
-| `-GitHubUser` / `-Author` | No | Sobreescriben los de `kit.config.json`. |
-| `-Category` / `-Keywords` | No | Metadatos del marketplace. `-Keywords "a, b, c"`. |
-| `-Version` | No | Versión inicial (por defecto `0.1.0`). |
-| `-OutDir` | No | Dónde crear el repo (por defecto la carpeta actual). |
-| `-WithScripts` | No | Crea `scripts/ejemplo.py` de muestra. |
-| `-GitInit` | No | Ejecuta `git init` + `git add` en el repo nuevo. |
-| `-Force` | No | Sobreescribe si la carpeta ya existe. |
-| `-DryRun` | No | Muestra qué crearía, sin escribir nada. |
-
-> Lo más importante es el **`-Trigger`**: es el texto que lee Claude para decidir si
-> activa el skill solo. Sé específico e incluye palabras clave (“cuando el usuario pegue X”,
-> “pida Y”).
-
----
-
-## 3) Publica en GitHub  ⚠️ el repo DEBE ser PÚBLICO
-
-La app de escritorio **no lee repos privados** (salvo conector de GitHub de la organización).
-
+### `bump <ruta> [version]` — actualizar
+La app de Claude cachea el marketplace; para que detecte un cambio hay que subir **todas**
+las versiones a la vez (marketplace.json + plugin.json):
 ```bash
-cd C:\Users\mz\Desktop\agentes\mi-agente
-git init
-git add -A
-git commit -m "Primer agente: mi-agente"
-git branch -M main
-git remote add origin https://github.com/<usuario>/mi-agente.git
-git push -u origin main
+npx claude-agent-kit-mz bump ./agentes/cotizador 0.2.0
+# sin versión → incrementa el patch (0.1.0 → 0.1.1)
 ```
-
-(Con el CLI `gh`: `gh repo create <usuario>/mi-agente --public --source=. --push`.)
 
 ---
 
-## 4) Instala en la app de Claude desktop
+## Publicar e instalar (resumen)
 
-1. Claude → en el cuadro de mensaje: **“+” → “Agregar plugins…”**.
-2. Pestaña **“Plugins”** → botón **“+”** (Agregar marketplace).
-3. En URL pega `usuario/repo` (ej. `mi-usuario/mi-agente`) → **Sincronizar**.
-4. Pestaña **“Personal”** → **“+”** para **instalar** el plugin.
-5. Listo: el skill se dispara solo al pedir lo que hace, en cualquier chat.
+1. **GitHub (repo PÚBLICO** — la app no lee privados sin conector):
+   ```bash
+   cd ./agentes/cotizador
+   git init && git add -A && git commit -m "Primer commit"
+   git branch -M main
+   git remote add origin https://github.com/<usuario>/cotizador.git
+   git push -u origin main
+   ```
+2. **Claude desktop**: “+” → “Agregar plugins…” → pestaña Plugins → “+” (marketplace) →
+   pega `usuario/repo` → **Sincronizar** → pestaña Personal → instala el plugin.
+3. **Actualizar**: `bump` → push → en la app **Sincronizar** + **Actualizar**. Si “Actualizar”
+   sigue gris, elimina y vuelve a agregar el marketplace (caché ~5 min).
 
 ---
 
-## 5) Actualiza el agente más adelante
+## Trucos
+- El `description` del **SKILL.md** es lo que hace que el agente **se dispare solo**: sé específico.
+- Repos de agentes **públicos**; **sube las dos versiones** al actualizar (lo hace `bump`).
+- Los `scripts/` corren en el **sandbox** de Claude; usa **rutas relativas** al SKILL.md.
 
-Cuando edites el agente, la app no detecta el cambio si no subes la versión.
-Usa el helper para subir **todas** las versiones a la vez:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\bump-version.ps1 `
-  -RepoPath C:\Users\mz\Desktop\agentes\mi-agente -NewVersion 0.2.0
-# (sin -NewVersion incrementa el patch: 0.1.0 -> 0.1.1)
-```
-
-Luego:
-
+## Desarrollo
 ```bash
-git add -A && git commit -m "v0.2.0" && git push
+git clone https://github.com/Maximiliano-zm/Kit-tools-A.git
+cd Kit-tools-A
+npm link                 # expone los comandos localmente
+claude-agent-kit-mz --help
 ```
 
-En la app: en el chip del marketplace **`···` → Sincronizar**, y en el plugin **“Actualizar”**.
-Si “Actualizar” sigue gris, **elimina y vuelve a agregar** el marketplace (la caché de
-GitHub tarda ~5 min en propagar).
-
----
-
-## Trucos aprendidos
-
-- **Privado no funciona** sin conector de GitHub → repo **público**.
-- **Sube las dos versiones** (marketplace.json *y* plugin.json) para forzar el refresh →
-  `bump-version.ps1` lo hace por ti.
-- El `description` del **SKILL.md** es clave para que el agente **se dispare solo**.
-- Los `scripts/` corren en el **sandbox** de Claude; referencia archivos con **rutas
-  relativas** al SKILL.md.
-- Confirma que la app puede **crear archivos** (genera un `.docx` de prueba) antes de
-  depender de eso.
-- Si PowerShell bloquea el script, llámalo con `-ExecutionPolicy Bypass` (como arriba).
+Licencia: MIT.

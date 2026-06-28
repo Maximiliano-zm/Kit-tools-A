@@ -1,0 +1,42 @@
+{
+  "name": "claude-agent-kit-mz",
+  "version": "0.1.0",
+  "description": "Crea agentes (plugins/skills) para la app de Claude desktop: genera marketplace + plugin + SKILL.md listos para publicar en GitHub e instalar. Incluye asistente interactivo.",
+  "type": "module",
+  "bin": {
+    "claude-agent-kit-mz": "bin/cli.js",
+    "crea-agente": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "templates/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "claude",
+    "claude-desktop",
+    "agent",
+    "agente",
+    "plugin",
+    "skill",
+    "marketplace",
+    "scaffold",
+    "generator",
+    "cli"
+  ],
+  "author": "Maximiliano Zurita (https://github.com/Maximiliano-zm)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maximiliano-zm/Kit-tools-A.git"
+  },
+  "homepage": "https://github.com/Maximiliano-zm/Kit-tools-A#readme",
+  "bugs": {
+    "url": "https://github.com/Maximiliano-zm/Kit-tools-A/issues"
+  }
+}
