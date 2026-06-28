@@ -1,0 +1,14 @@
+# Basura del sistema / editores
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Salidas de prueba / agentes generados dentro del kit por error
+build/
+out/
+agents/
+*-demo/
+kit-test-*/

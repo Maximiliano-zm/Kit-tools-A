@@ -1,0 +1,12 @@
+{
+  "name": "{{AGENT_NAME}}",
+  "version": "{{VERSION}}",
+  "description": "{{AGENT_DESCRIPTION_LONG}}",
+  "author": {
+    "name": "{{AUTHOR_NAME}}",
+    "url": "https://github.com/{{GITHUB_USER}}"
+  },
+  "homepage": "https://github.com/{{GITHUB_USER}}/{{REPO_NAME}}",
+  "repository": "https://github.com/{{GITHUB_USER}}/{{REPO_NAME}}",
+  "license": "{{LICENSE}}"
+}
